@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elise's Poked Pieces, Consent Form</title>
+<script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-compat.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3F1E9;
+    --panel:#EDEADF;
+    --ink:#1C1C18;
+    --muted:#8F8C7E;
+    --line:#D8D4C6;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:'IBM Plex Mono',monospace; }
+  .page{ max-width:720px; margin:0 auto; padding:36px 24px 100px; }
+
+  nav{
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding-bottom:40px; border-bottom:1px solid var(--ink);
+    font-size:12px; letter-spacing:0.06em; text-transform:uppercase;
+  }
+  nav .brand{ font-weight:600; }
+  nav .place{ color:var(--muted); }
+
+  .eyebrow{
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted);
+    margin:44px 0 18px;
+  }
+
+  h1{
+    font-family:'IBM Plex Mono',monospace; font-weight:600;
+    font-size:clamp(30px, 6vw, 44px); letter-spacing:-0.01em; margin:0 0 26px; line-height:1.05;
+  }
+
+  .intro{ font-size:14px; line-height:1.85; color:var(--ink); max-width:600px; margin-bottom:44px; }
+
+  .chapter{ margin-top:56px; }
+  .chapter-head{
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; letter-spacing:0.06em; text-transform:uppercase;
+    border-bottom:1px solid var(--ink); padding-bottom:10px; margin-bottom:4px;
+  }
+  .chapter-head .arrow{ color:var(--muted); }
+  .chapter-head .title{ font-weight:600; }
+
+  .field-row{ padding:24px 0; border-bottom:1px dashed var(--line); }
+  .field-row:last-child{ border-bottom:none; }
+  label.title{ display:block; font-size:13.5px; font-weight:600; margin-bottom:10px; line-height:1.5; }
+  label.title .req{ color:var(--muted); font-weight:400; font-size:11px; text-transform:uppercase; margin-left:8px; }
+  .hint{ font-size:12px; color:var(--muted); line-height:1.7; margin-top:-2px; margin-bottom:12px; }
+
+  input[type=text], input[type=email], input[type=number], input[type=date], select, textarea{
+    width:100%; font-family:'IBM Plex Mono',monospace; font-size:14px;
+    padding:9px 2px; background:transparent; border:none; border-bottom:1px solid var(--line);
+    color:var(--ink); outline:none;
+  }
+  input::placeholder, textarea::placeholder{ color:#B3AF9D; }
+  input:focus, textarea:focus{ border-color:var(--ink); }
+  textarea{
+    background:var(--panel); border:1px solid var(--line); padding:12px;
+    min-height:70px; line-height:1.6; resize:vertical;
+  }
+
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:520px){ .row2{ grid-template-columns:1fr; gap:14px; } }
+
+  .radio-row{ display:flex; gap:24px; margin-top:4px; }
+  .radio-opt{ display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; }
+  .radio-opt input{ width:auto; accent-color:var(--ink); }
+
+  .check-item{ display:flex; align-items:flex-start; gap:12px; padding:14px 0; border-bottom:1px dashed var(--line); }
+  .check-item:last-child{ border-bottom:none; }
+  .check-item input{ width:auto; margin-top:3px; accent-color:var(--ink); flex-shrink:0; }
+  .check-item p{ font-size:13px; line-height:1.6; margin:0; }
+
+  .note-box{
+    background:var(--panel); border:1px solid var(--line); padding:16px 18px; margin:24px 0 0;
+    font-size:12.5px; line-height:1.7; color:var(--ink);
+  }
+
+  .submit-row{ margin-top:40px; border-top:1px solid var(--line); padding-top:22px; }
+  button[type=submit]{
+    width:100%; background:none; border:none; display:flex; justify-content:space-between; align-items:center;
+    font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--ink); padding:14px 0; cursor:pointer; transition:opacity .15s ease;
+  }
+  button[type=submit]:hover{ opacity:0.6; }
+  .status{ display:none; margin-top:14px; font-size:12px; color:var(--muted); }
+  .status.show{ display:block; }
+
+  footer{ margin-top:80px; border-top:1px solid var(--line); padding-top:22px; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav>
+    <span class="brand">Elise's Poked Pieces</span>
+    <span class="place">Consent form</span>
+  </nav>
+
+  <div class="eyebrow"><span class="arrow">↓</span><span>Before your appointment</span></div>
+  <h1>Consent form</h1>
+  <p class="intro">Please read this carefully and fill it in before your appointment. It takes a few minutes and covers everything needed to go ahead safely.</p>
+
+  <form id="consentForm" action="https://formsubmit.co/elise.allison16@gmail.com" method="POST">
+    <input type="hidden" name="_subject" value="New signed consent form">
+    <input type="hidden" name="_template" value="table">
+    <input type="hidden" name="_captcha" value="false">
+    <input type="text" name="_honey" style="display:none">
+
+    <div class="chapter">
+      <div class="chapter-head"><span class="arrow">↓</span><span class="title">Client information</span></div>
+      <div class="field-row">
+        <label class="title">Full name<span class="req">required</span></label>
+        <div class="row2">
+          <input type="text" name="First Name" placeholder="First name" required>
+          <input type="text" name="Last Name" placeholder="Last name" required>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="row2">
+          <div>
+            <label class="title">Age<span class="req">required</span></label>
+            <input type="number" name="Age" min="16" max="120" required>
+          </div>
+          <div>
+            <label class="title">Date of birth<span class="req">required</span></label>
+            <input type="date" name="Date of Birth" required>
+          </div>
+        </div>
+      </div>
+      <div class="field-row">
+        <label class="title">Email<span class="req">required</span></label>
+        <input type="email" name="Email" placeholder="you@example.com" required>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <div class="chapter-head"><span class="arrow">↓</span><span class="title">Pre-procedure questionnaire</span></div>
+      <div class="field-row">
+        <label class="title">Are you under the influence of drugs or alcohol today?<span class="req">required</span></label>
+        <div class="radio-row">
+          <label class="radio-opt"><input type="radio" name="Under Influence" value="Yes" required> Yes</label>
+          <label class="radio-opt"><input type="radio" name="Under Influence" value="No" required> No</label>
+        </div>
+      </div>
+      <div class="field-row">
+        <label class="title">If applicable, are you pregnant or nursing?</label>
+        <div class="radio-row">
+          <label class="radio-opt"><input type="radio" name="Pregnant Or Nursing" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="Pregnant Or Nursing" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="Pregnant Or Nursing" value="N/A"> N/A</label>
+        </div>
+      </div>
+      <div class="field-row">
+        <label class="title">Do you have any communicable disease?<span class="req">required</span></label>
+        <div class="radio-row">
+          <label class="radio-opt"><input type="radio" name="Communicable Disease" value="Yes" required> Yes</label>
+          <label class="radio-opt"><input type="radio" name="Communicable Disease" value="No" required> No</label>
+        </div>
+      </div>
+      <div class="field-row">
+        <label class="title">Skin conditions</label>
+        <div class="hint">Rashes, eczema, infection, psoriasis, or similar. Leave blank if none.</div>
+        <textarea name="Skin Conditions"></textarea>
+      </div>
+      <div class="field-row">
+        <label class="title">Relevant medical history</label>
+        <div class="hint">Diabetes, cardiovascular disease, epilepsy, blood related conditions, or similar. Leave blank if none.</div>
+        <textarea name="Medical History"></textarea>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <div class="chapter-head"><span class="arrow">↓</span><span class="title">Acknowledgment and waiver</span></div>
+
+      <div class="check-item">
+        <input type="checkbox" name="Ack Permanent" value="Yes" required>
+        <p>I understand that tattooing is a permanent change to my skin and body.</p>
+      </div>
+      <div class="check-item">
+        <input type="checkbox" name="Ack Design Variation" value="Yes" required>
+        <p>I understand that a tattoo is hand applied, not printed, so the finished piece may vary slightly from the original design in line weight, shading, placement, or scale. Elise will always work carefully to stay true to the design, but small natural variation is a normal part of the process and isn't grounds for a refund or redo.</p>
+      </div>
+      <div class="check-item">
+        <input type="checkbox" name="Ack Photography" value="Yes" required>
+        <p>I allow my tattoo to be photographed and used for the studio's portfolio and social media.</p>
+      </div>
+      <div class="check-item">
+        <input type="checkbox" name="Ack No Refund" value="Yes" required>
+        <p>I understand that the studio does not offer refunds once a tattoo has been completed.</p>
+      </div>
+      <div class="check-item">
+        <input type="checkbox" name="Ack Allergy" value="Yes" required>
+        <p>I understand the studio has no way of knowing in advance whether I'm allergic to any ingredient used in the tattooing process.</p>
+      </div>
+      <div class="check-item">
+        <input type="checkbox" name="Ack Aftercare" value="Yes" required>
+        <p>I understand it's my responsibility to look after the tattoo using the aftercare instructions provided.</p>
+      </div>
+      <div class="check-item">
+        <input type="checkbox" name="Ack Infection Risk" value="Yes" required>
+        <p>I understand that not following aftercare instructions properly can lead to infection.</p>
+      </div>
+      <div class="check-item">
+        <input type="checkbox" name="Ack Indemnify" value="Yes" required>
+        <p>I release the studio from any claims, expenses, damages, or liabilities related to this procedure.</p>
+      </div>
+      <div class="check-item">
+        <input type="checkbox" name="Ack Accurate" value="Yes" required>
+        <p>I confirm that everything I've entered in this form is accurate and true.</p>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <div class="chapter-head"><span class="arrow">↓</span><span class="title">Signature</span></div>
+      <div class="field-row">
+        <div class="row2">
+          <div>
+            <label class="title">Date signed<span class="req">required</span></label>
+            <input type="date" name="Date Signed" required>
+          </div>
+          <div>
+            <label class="title">Type your full name to sign<span class="req">required</span></label>
+            <input type="text" name="Signature" placeholder="Your full name" required>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note-box">By typing your name above, you're confirming this counts as your signature on this consent form, the same as signing on paper.</div>
+
+    <div class="submit-row">
+      <button type="submit"><span>Submit consent form</span><span>→</span></button>
+      <div class="status" id="statusBox">Sending…</div>
+    </div>
+  </form>
+
+  <footer>Elise's Poked Pieces</footer>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAGwKqASaB7-ryHpbjXMYANnpqP_KC7bC8",
+    authDomain: "toniagost-app.firebaseapp.com",
+    projectId: "toniagost-app",
+    storageBucket: "toniagost-app.firebasestorage.app",
+    messagingSenderId: "62278378303",
+    appId: "1:62278378303:web:ada753e0d88d2be3f2a98a"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const form = document.getElementById('consentForm');
+  const statusBox = document.getElementById('statusBox');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    statusBox.classList.add('show');
+
+    try{
+      await db.collection('consents').add({
+        first: form['First Name'].value,
+        last: form['Last Name'].value,
+        email: form['Email'].value,
+        age: form['Age'].value,
+        dob: form['Date of Birth'].value,
+        underInfluence: form['Under Influence'].value,
+        pregnantNursing: form['Pregnant Or Nursing'].value || '',
+        communicableDisease: form['Communicable Disease'].value,
+        skinConditions: form['Skin Conditions'].value,
+        medicalHistory: form['Medical History'].value,
+        signature: form['Signature'].value,
+        dateSigned: form['Date Signed'].value,
+        owner: 'elise.allison16@gmail.com',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch(err){
+      console.error('Could not save consent record', err);
+    }
+
+    form['_subject'].value = 'New signed consent form, ' + form['First Name'].value + ' ' + form['Last Name'].value;
+    form.submit();
+  });
+</script>
+</body>
+</html>
